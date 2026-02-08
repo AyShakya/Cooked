@@ -1,0 +1,345 @@
+/* Reset & Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;600&display=swap');
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --brand-color: #fff; /* Dynamic */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden; /* Prevent scroll bars during transitions */
+}
+
+/* Main Container with Dynamic Background */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background-color 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+
+/* Noise Texture for that "Premium" feel */
+.noise-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.content-wrapper {
+  z-index: 2;
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Typography */
+.logo-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -1px;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+}
+
+.subtitle {
+  text-align: center;
+  opacity: 0.6;
+  margin-top: 8px;
+  margin-bottom: 40px;
+  font-size: 1.1rem;
+}
+
+/* Grid Menu (Selection Phase) */
+.grid-menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+/* The third item (Spotify) spans full width on mobile, or fits grid */
+.grid-menu > :last-child {
+  grid-column: span 2;
+}
+
+.brand-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  color: white;
+  transition: border-color 0.3s ease, background 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.brand-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.brand-name {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.brand-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.tag-soon {
+  font-size: 0.7rem;
+  background: #333;
+  padding: 4px 8px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Input Phase */
+.input-stage {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.roast-form {
+  position: relative;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.grand-input {
+  width: 100%;
+  padding: 20px 25px;
+  padding-right: 60px; /* Space for button */
+  font-size: 1.2rem;
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  border-radius: 16px;
+  color: #fff;
+  outline: none;
+  font-family: 'Space Grotesk', monospace;
+  transition: all 0.3s ease;
+}
+
+.grand-input:focus {
+  border-color: var(--brand-color);
+  background: rgba(0,0,0,0.4);
+  box-shadow: 0 0 30px -5px var(--brand-color);
+}
+
+.submit-btn {
+  position: absolute;
+  right: 10px;
+  width: 45px;
+  height: 45px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.error-msg {
+  color: #ff6b6b;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Roast Result Card */
+.roast-card {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--brand-color);
+  padding: 25px;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+}
+
+.roast-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+  color: #eee;
+}
+
+.roast-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.icon-btn:hover {
+  color: #fff;
+}
+
+/* Back Button */
+.back-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin: 0 auto;
+  font-size: 0.9rem;
+  padding: 10px;
+}
+
+.back-btn:hover {
+  color: #fff;
+}
+
+/* Auth Screen Styles */
+.auth-card {
+  background: rgba(20, 20, 20, 0.9);
+  border: 1px solid #333;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.1);
+}
+
+.lock-icon {
+  background: rgba(255, 50, 50, 0.1);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 1px solid rgba(255, 50, 50, 0.2);
+}
+
+.auth-title {
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  margin-bottom: 5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.auth-subtitle {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 30px;
+  font-family: monospace;
+}
+
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input {
+  width: 100%;
+  background: #000;
+  border: 1px solid #333;
+  padding: 15px;
+  color: #fff;
+  font-family: monospace;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  outline: none;
+  letter-spacing: 3px;
+  text-align: center;
+  transition: border 0.3s;
+}
+
+.auth-input:focus {
+  border-color: #ff3333;
+}
+
+.auth-btn {
+  position: absolute;
+  right: 5px;
+  background: #333;
+  border: none;
+  color: white;
+  width: 35px;
+  height: 35px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-btn:hover {
+  background: #ff3333;
+}
+
+.auth-error {
+  color: #ff3333;
+  margin-top: 15px;
+  font-size: 0.8rem;
+  font-family: monospace;
+  background: rgba(255, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.5);
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    z-index: 10;
+}

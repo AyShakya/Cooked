@@ -1,0 +1,9 @@
+# Ignore all env files
+.env
+.env.*
+
+# Explicit frontend & backend envs
+frontend/.env
+backend/.env
+
+node_modules
