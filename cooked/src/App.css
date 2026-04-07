@@ -1,10 +1,9 @@
-/* Reset & Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --brand-color: #fff; /* Dynamic */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --brand-color: #fff;
 }
 
 * {
@@ -14,24 +13,23 @@
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  overflow: hidden; /* Prevent scroll bars during transitions */
+  background: #0d0f16;
 }
 
-/* Main Container with Dynamic Background */
 .app-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  transition: background-color 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: background-color 0.6s ease;
   position: relative;
+  padding: 20px;
 }
 
-/* Noise Texture for that "Premium" feel */
 .noise-overlay {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
+  inset: 0;
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 1;
@@ -40,75 +38,91 @@ body {
 .content-wrapper {
   z-index: 2;
   width: 100%;
-  max-width: 500px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  max-width: 960px;
 }
 
-/* Typography */
+.site-shell {
+  background: linear-gradient(140deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 26px;
+  backdrop-filter: blur(12px);
+  padding: 28px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+}
+
+.hero-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  opacity: 0.75;
+}
+
 .logo-text {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 3rem;
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
-  margin: 0;
-  text-align: center;
-  letter-spacing: -1px;
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
 }
 
 .subtitle {
-  text-align: center;
-  opacity: 0.6;
-  margin-top: 8px;
-  margin-bottom: 40px;
-  font-size: 1.1rem;
+  opacity: 0.85;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
-/* Grid Menu (Selection Phase) */
+.feature-strip {
+  margin: 20px auto 30px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.feature-strip span {
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 12px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  background: rgba(0,0,0,0.2);
+}
+
 .grid-menu {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  width: 100%;
-}
-
-/* The third item (Spotify) spans full width on mobile, or fits grid */
-.grid-menu > :last-child {
-  grid-column: span 2;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .brand-card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 30px 20px;
+  border-radius: 18px;
+  min-height: 140px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
-  cursor: pointer;
+  justify-content: center;
+  gap: 12px;
   color: white;
-  transition: border-color 0.3s ease, background 0.3s ease;
-  backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
 .brand-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-.brand-name {
-  font-weight: 600;
-  font-size: 1.2rem;
+  border-color: color-mix(in srgb, var(--brand-color) 50%, white);
 }
 
 .brand-card.disabled {
   opacity: 0.5;
   cursor: not-allowed;
   filter: grayscale(1);
+}
+
+.brand-name {
+  font-weight: 600;
 }
 
 .tag-soon {
@@ -120,17 +134,60 @@ body {
   letter-spacing: 1px;
 }
 
-/* Input Phase */
 .input-stage {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  gap: 16px;
 }
 
-.roast-form {
-  position: relative;
+.style-panel {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 16px;
 }
+
+.style-panel h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.style-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.style-option {
+  text-align: left;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+  color: white;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+}
+
+.style-option.active {
+  border-color: var(--brand-color);
+  box-shadow: 0 0 0 1px var(--brand-color) inset;
+  background: rgba(255,255,255,0.12);
+}
+
+.style-option small {
+  opacity: 0.75;
+  font-size: 0.72rem;
+}
+
+.style-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.roast-form { position: relative; }
 
 .input-group {
   position: relative;
@@ -140,54 +197,53 @@ body {
 
 .grand-input {
   width: 100%;
-  padding: 20px 25px;
-  padding-right: 60px; /* Space for button */
-  font-size: 1.2rem;
+  padding: 18px 20px;
+  padding-right: 58px;
+  font-size: 1.05rem;
   background: var(--glass-bg);
   border: 2px solid var(--glass-border);
-  border-radius: 16px;
+  border-radius: 14px;
   color: #fff;
   outline: none;
   font-family: 'Space Grotesk', monospace;
-  transition: all 0.3s ease;
 }
 
 .grand-input:focus {
   border-color: var(--brand-color);
-  background: rgba(0,0,0,0.4);
-  box-shadow: 0 0 30px -5px var(--brand-color);
+  box-shadow: 0 0 22px -8px var(--brand-color);
 }
 
 .submit-btn {
   position: absolute;
-  right: 10px;
-  width: 45px;
-  height: 45px;
+  right: 8px;
+  width: 42px;
+  height: 42px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .error-msg {
-  color: #ff6b6b;
+  color: #ff9f9f;
   margin-top: 10px;
   font-size: 0.9rem;
   text-align: center;
 }
 
-/* Roast Result Card */
 .roast-card {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.55);
   border: 1px solid var(--brand-color);
-  padding: 25px;
+  padding: 20px;
   border-radius: 16px;
-  position: relative;
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+}
+
+.roast-meta {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.75;
 }
 
 .roast-text {
@@ -195,46 +251,30 @@ body {
   line-height: 1.6;
   margin: 0;
   font-style: italic;
-  color: #eee;
 }
 
 .roast-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 15px;
+  margin-top: 14px;
 }
 
-.icon-btn {
-  background: transparent;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.icon-btn:hover {
-  color: #fff;
-}
-
-/* Back Button */
+.icon-btn,
 .back-btn {
   background: transparent;
   border: none;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+}
+
+.back-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-  margin: 0 auto;
-  font-size: 0.9rem;
-  padding: 10px;
+  justify-content: center;
+  padding: 6px;
 }
 
-.back-btn:hover {
-  color: #fff;
-}
-
-/* Auth Screen Styles */
 .auth-card {
   background: rgba(20, 20, 20, 0.9);
   border: 1px solid #333;
@@ -243,7 +283,6 @@ body {
   text-align: center;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 0 50px rgba(255, 0, 0, 0.1);
 }
 
 .lock-icon {
@@ -255,22 +294,18 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  border: 1px solid rgba(255, 50, 50, 0.2);
 }
 
 .auth-title {
   color: #fff;
   font-family: 'Space Grotesk', sans-serif;
   margin-bottom: 5px;
-  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
 .auth-subtitle {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 30px;
-  font-family: monospace;
+  color: #888;
+  margin-bottom: 24px;
 }
 
 .auth-input-wrapper {
@@ -285,17 +320,9 @@ body {
   border: 1px solid #333;
   padding: 15px;
   color: #fff;
-  font-family: monospace;
-  font-size: 1.2rem;
+  font-size: 1rem;
   border-radius: 8px;
-  outline: none;
-  letter-spacing: 3px;
   text-align: center;
-  transition: border 0.3s;
-}
-
-.auth-input:focus {
-  border-color: #ff3333;
 }
 
 .auth-btn {
@@ -308,38 +335,37 @@ body {
   height: 35px;
   border-radius: 6px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-btn:hover {
-  background: #ff3333;
 }
 
 .auth-error {
-  color: #ff3333;
+  color: #ff7474;
   margin-top: 15px;
-  font-size: 0.8rem;
-  font-family: monospace;
-  background: rgba(255, 0, 0, 0.1);
-  padding: 10px;
-  border-radius: 4px;
+  font-size: 0.85rem;
 }
 
 .logout-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.5);
-    padding: 8px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.8rem;
-    z-index: 10;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.75);
+  padding: 8px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 10;
+}
+
+@media (max-width: 840px) {
+  .grid-menu,
+  .style-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell {
+    padding: 20px;
+  }
 }
