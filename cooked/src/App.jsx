@@ -1,27 +1,38 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Github, Flame, Music, ArrowLeft, Send, Copy, Check, 
-  Lock, Unlock, ArrowRight 
+import { motion as m, AnimatePresence } from "framer-motion";
+import {
+  Github,
+  Flame,
+  Music,
+  ArrowLeft,
+  Send,
+  Copy,
+  Check,
+  Lock,
+  Unlock,
+  ArrowRight,
+  Sparkles,
+  WandSparkles,
+  Zap,
 } from "lucide-react";
-import { api } from "./api/axios"; 
+import { api } from "./api/axios";
+const _MOTION = m;
 import "./App.css";
-
 
 const BRANDS = {
   github: {
     name: "GitHub",
     color: "#238636",
     bg: "#0d1117",
-    icon: <Github size={48} />,
+    icon: <Github size={44} />,
     tagline: "Commit crimes exposed.",
     placeholder: "github_username",
   },
   reddit: {
     name: "Reddit",
     color: "#FF4500",
-    bg: "#1A1A1B", 
-    icon: <Flame size={48} />,
+    bg: "#1A1A1B",
+    icon: <Flame size={44} />,
     tagline: "Karma won't save you.",
     placeholder: "u/redditor",
   },
@@ -29,11 +40,32 @@ const BRANDS = {
     name: "Spotify",
     color: "#1DB954",
     bg: "#191414",
-    icon: <Music size={48} />,
+    icon: <Music size={44} />,
     tagline: "Bad taste detected.",
     disabled: true,
   },
 };
+
+const ROAST_STYLES = [
+  {
+    id: "friendly",
+    label: "Friendly Burn",
+    description: "Clever and playful, safe for sharing.",
+    icon: <Sparkles size={18} />,
+  },
+  {
+    id: "savage",
+    label: "Savage",
+    description: "Sharper jokes and extra spice.",
+    icon: <Zap size={18} />,
+  },
+  {
+    id: "analyst",
+    label: "Tech Analyst",
+    description: "Roasts like a product teardown report.",
+    icon: <WandSparkles size={18} />,
+  },
+];
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,8 +73,9 @@ export default function App() {
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
 
-  const [provider, setProvider] = useState(null); 
+  const [provider, setProvider] = useState(null);
   const [username, setUsername] = useState("");
+  const [roastStyle, setRoastStyle] = useState(ROAST_STYLES[0].id);
   const [roast, setRoast] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,10 +89,10 @@ export default function App() {
   }, []);
 
   const activeTheme = provider ? BRANDS[provider] : null;
-  
+
   const handleUnlock = async () => {
     if (!vipCodeInput.trim()) return;
-    
+
     setAuthLoading(true);
     setAuthError("");
 
@@ -68,7 +101,7 @@ export default function App() {
       setIsAuthenticated(true);
       localStorage.setItem("is_logged_in", "true");
       setVipCodeInput("");
-    } catch (err) {
+    } catch {
       setAuthError("⛔ ACCESS DENIED: Invalid VIP Code.");
       setIsAuthenticated(false);
     } finally {
@@ -104,7 +137,7 @@ export default function App() {
 
     try {
       const res = await api.post(`/${provider}`, null, {
-        params: { username },
+        params: { username, roastStyle },
       });
       setRoast(res.data.roast);
     } catch (err) {
@@ -141,7 +174,7 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="app-container" style={{ background: "#050505" }}>
-        <motion.div 
+        <m.div
           className="auth-card"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -151,37 +184,33 @@ export default function App() {
           </div>
           <h1 className="auth-title">Restricted Access</h1>
           <p className="auth-subtitle">Enter VIP Clearance Code</p>
-          
+
           <div className="auth-input-wrapper">
-            <input 
-              type="password" 
+            <input
+              type="password"
               className="auth-input"
               placeholder="PASSCODE"
               value={vipCodeInput}
               onChange={(e) => setVipCodeInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
+              onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
               disabled={authLoading}
             />
-            <button 
-              className="auth-btn" 
-              onClick={handleUnlock}
-              disabled={authLoading}
-            >
+            <button className="auth-btn" onClick={handleUnlock} disabled={authLoading}>
               {authLoading ? (
-                <motion.div
+                <m.div
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 1 }}
                 >
                   ⏳
-                </motion.div>
+                </m.div>
               ) : (
                 <ArrowRight size={20} />
               )}
             </button>
           </div>
-          
+
           {authError && <p className="auth-error">{authError}</p>}
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -190,39 +219,42 @@ export default function App() {
     <div
       className="app-container"
       style={{
-        backgroundColor: activeTheme ? activeTheme.bg : "#111",
-        "--brand-color": activeTheme ? activeTheme.color : "#fff",
+        backgroundColor: activeTheme ? activeTheme.bg : "#0d0f16",
+        "--brand-color": activeTheme ? activeTheme.color : "#8f9bb3",
       }}
     >
-      {/* Logout Button */}
       <button className="logout-btn" onClick={handleLogout}>
         <Unlock size={14} /> Exit VIP
       </button>
 
-      <div className="noise-overlay"></div>
+      <div className="noise-overlay" />
 
-      <div className="content-wrapper">
-        <header className="main-header">
-          <motion.h1
+      <div className="content-wrapper site-shell">
+        <header className="hero-header">
+          <span className="eyebrow">AI Roast Studio</span>
+          <m.h1
             layoutId="title"
             className="logo-text"
             style={{ color: activeTheme ? activeTheme.color : "#fff" }}
           >
             {activeTheme ? `${activeTheme.name} Roast` : "Cooked."}
-          </motion.h1>
-          <motion.p 
-            className="subtitle"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-             {activeTheme ? activeTheme.tagline : "Choose your victim's platform."}
-          </motion.p>
+          </m.h1>
+          <m.p className="subtitle" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {activeTheme
+              ? activeTheme.tagline
+              : "Pick a platform, choose a roast personality, and generate a custom burn in seconds."}
+          </m.p>
         </header>
+
+        <div className="feature-strip">
+          <span>⚡ instant punchlines</span>
+          <span>🧠 style-aware prompts</span>
+          <span>📋 one-click copy</span>
+        </div>
 
         <AnimatePresence mode="wait">
           {!provider ? (
-            // --- SELECTION SCREEN ---
-            <motion.div
+            <m.div
               key="selection"
               className="grid-menu"
               initial={{ opacity: 0, y: 20 }}
@@ -231,12 +263,12 @@ export default function App() {
               transition={{ duration: 0.3 }}
             >
               {Object.entries(BRANDS).map(([key, brand]) => (
-                <motion.button
+                <m.button
                   key={key}
                   className={`brand-card ${brand.disabled ? "disabled" : ""}`}
                   onClick={() => !brand.disabled && setProvider(key)}
-                  whileHover={!brand.disabled ? { scale: 1.05, y: -5 } : {}}
-                  whileTap={!brand.disabled ? { scale: 0.95 } : {}}
+                  whileHover={!brand.disabled ? { scale: 1.03, y: -4 } : {}}
+                  whileTap={!brand.disabled ? { scale: 0.98 } : {}}
                   disabled={brand.disabled}
                 >
                   <div className="icon-wrapper" style={{ color: brand.color }}>
@@ -244,12 +276,11 @@ export default function App() {
                   </div>
                   <span className="brand-name">{brand.name}</span>
                   {brand.disabled && <span className="tag-soon">Soon</span>}
-                </motion.button>
+                </m.button>
               ))}
-            </motion.div>
+            </m.div>
           ) : (
-            // --- INPUT SCREEN ---
-            <motion.div
+            <m.div
               key="input"
               className="input-stage"
               initial={{ opacity: 0, y: 50 }}
@@ -257,6 +288,23 @@ export default function App() {
               exit={{ opacity: 0, y: 50 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
+              <section className="style-panel">
+                <h3>Roast personality</h3>
+                <div className="style-grid">
+                  {ROAST_STYLES.map((style) => (
+                    <button
+                      key={style.id}
+                      type="button"
+                      className={`style-option ${roastStyle === style.id ? "active" : ""}`}
+                      onClick={() => setRoastStyle(style.id)}
+                    >
+                      <span className="style-label">{style.icon} {style.label}</span>
+                      <small>{style.description}</small>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
               <form onSubmit={handleRoast} className="roast-form">
                 <div className="input-group">
                   <input
@@ -271,56 +319,43 @@ export default function App() {
                     }}
                     disabled={loading}
                   />
-                  <motion.button
+                  <m.button
                     type="submit"
                     className="submit-btn"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.07 }}
+                    whileTap={{ scale: 0.92 }}
                     disabled={loading}
                     style={{ backgroundColor: activeTheme.color }}
                   >
-                    {loading ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1 }}
-                      >
-                        Fireee
-                      </motion.div>
-                    ) : (
-                      <Send size={20} />
-                    )}
-                  </motion.button>
+                    {loading ? "..." : <Send size={20} />}
+                  </m.button>
                 </div>
                 {error && <p className="error-msg">{error}</p>}
               </form>
 
-              {/* ROAST RESULT CARD */}
               <AnimatePresence>
                 {roast && (
-                  <motion.div
+                  <m.div
                     className="roast-card"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ type: "spring" }}
                   >
+                    <p className="roast-meta">Style: {ROAST_STYLES.find((x) => x.id === roastStyle)?.label}</p>
                     <p className="roast-text">"{roast}"</p>
                     <div className="roast-actions">
                       <button className="icon-btn" onClick={copyRoast}>
                         {copied ? <Check size={18} /> : <Copy size={18} />}
                       </button>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
 
-              <motion.button
-                className="back-btn"
-                onClick={resetFlow}
-                whileHover={{ x: -5 }}
-              >
+              <m.button className="back-btn" onClick={resetFlow} whileHover={{ x: -5 }}>
                 <ArrowLeft size={16} /> Change Platform
-              </motion.button>
-            </motion.div>
+              </m.button>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

@@ -1,15 +1,25 @@
 import openai from "./OpenAi.service.js";
 
-export async function generateRoast(profile) {
+const STYLE_PROMPTS = {
+  friendly:
+    "Playful and witty. Keep it light, clever, and not mean-spirited.",
+  savage:
+    "Sharper jokes with bold punchlines, but avoid hateful or abusive language.",
+  analyst:
+    "Roast like a sarcastic product analyst doing a teardown with nerdy humor.",
+};
+
+export async function generateRoast(profile, roastStyle = "friendly") {
+  const selectedStyle = STYLE_PROMPTS[roastStyle] ? roastStyle : "friendly";
+
   try {
     const response = await openai.chat.completions.create({
-      model:"llama-3.1-8b-instant",
+      model: "llama-3.1-8b-instant",
       temperature: 0.9,
       messages: [
         {
           role: "system",
-          content:
-            "You are a witty internet roast comic. Clever, playful, not mean."
+          content: `You are a witty internet roast comic. ${STYLE_PROMPTS[selectedStyle]}`,
         },
         {
           role: "user",
@@ -17,10 +27,10 @@ export async function generateRoast(profile) {
 User profile:
 ${JSON.stringify(profile, null, 2)}
 
-Roast this person in 4 witty lines.
-`
-        }
-      ]
+Generate exactly 4 short roast lines in style: ${selectedStyle}.
+`,
+        },
+      ],
     });
 
     return response.choices[0].message.content;
