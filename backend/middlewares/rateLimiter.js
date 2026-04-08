@@ -9,9 +9,10 @@ export const apiLimiter = rateLimit({
 });
 
 export const authLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, 
+  windowMs: 24 * 60 * 60 * 1000, 
   max: 5, 
   message: { error: "Security Alert: Too many failed login attempts. You are blocked for whole day." },
   standardHeaders: true,
   legacyHeaders: false,
+  skipSuccessfulRequests: true,
 });
