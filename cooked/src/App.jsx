@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion as m, AnimatePresence } from "framer-motion";
 import {
   Github,
@@ -83,8 +83,16 @@ export default function App() {
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("is_logged_in");
-    if (isLoggedIn) {
+    const lastActivity = parseInt(localStorage.getItem("last_activity") || "0");
+    const now = Date.now();
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+
+    if (isLoggedIn && (now - lastActivity < INACTIVITY_LIMIT)) {
       setIsAuthenticated(true);
+    } else {
+      localStorage.removeItem("is_logged_in");
+      localStorage.removeItem("last_activity");
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -98,8 +106,9 @@ export default function App() {
 
     try {
       await api.post("/verify-vip", { code: vipCodeInput });
-      setIsAuthenticated(true);
       localStorage.setItem("is_logged_in", "true");
+      localStorage.setItem("last_activity", Date.now().toString());
+      setIsAuthenticated(true);
       setVipCodeInput("");
     } catch {
       setAuthError("⛔ ACCESS DENIED: Invalid VIP Code.");
@@ -109,19 +118,61 @@ export default function App() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.post("/logout");
-    } catch (err) {
-      console.error("Logout failed", err);
-    } finally {
-      localStorage.removeItem("is_logged_in");
-      setIsAuthenticated(false);
-      setProvider(null);
-      setRoast("");
-      setUsername("");
-    }
-  };
+  const handleLogout = useCallback(() => {
+    // 1. Optimistic UI update: Immediate transition
+    setIsAuthenticated(false);
+    setProvider(null);
+    setRoast("");
+    setUsername("");
+    
+    // 2. Local Storage Cleanup
+    localStorage.removeItem("is_logged_in");
+    localStorage.removeItem("last_activity");
+
+    // 3. Fire and forget logout request to server
+    api.post("/logout").catch((err) => {
+      console.warn("Server logout failed, but local session cleared.", err);
+    });
+  }, []);
+
+  // Auto-Logout Logic
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes
+    let timeoutId;
+
+    const resetTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      const lastActivity = parseInt(localStorage.getItem("last_activity") || "0");
+      const now = Date.now();
+      
+      if (now - lastActivity > INACTIVITY_LIMIT) {
+        handleLogout();
+        return;
+      }
+
+      timeoutId = setTimeout(() => {
+        handleLogout();
+      }, INACTIVITY_LIMIT);
+    };
+
+    const handleActivity = () => {
+      localStorage.setItem("last_activity", Date.now().toString());
+      resetTimer();
+    };
+
+    resetTimer();
+
+    const activityEvents = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "click"];
+    activityEvents.forEach((ev) => window.addEventListener(ev, handleActivity, { passive: true }));
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      activityEvents.forEach((ev) => window.removeEventListener(ev, handleActivity));
+    };
+  }, [isAuthenticated, handleLogout]);
 
   const handleRoast = async (e) => {
     e.preventDefault();
@@ -144,6 +195,7 @@ export default function App() {
       if (err.response && (err.response.status === 401 || err.response.status === 403)) {
         setIsAuthenticated(false);
         localStorage.removeItem("is_logged_in");
+        localStorage.removeItem("last_activity");
         setAuthError("Session expired. Please re-enter VIP Code.");
       } else if (err.response && err.response.status === 429) {
         setError("You're roasting too fast! Cool down.");

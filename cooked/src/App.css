@@ -327,14 +327,33 @@ body {
 
 .auth-btn {
   position: absolute;
-  right: 5px;
-  background: #333;
-  border: none;
+  right: 6px;
+  background: #222;
+  border: 1px solid #444;
   color: white;
-  width: 35px;
-  height: 35px;
-  border-radius: 6px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.auth-btn:hover:not(:disabled) {
+  background: #333;
+  border-color: #666;
+  transform: scale(1.05);
+}
+
+.auth-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .auth-error {
@@ -347,16 +366,33 @@ body {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.75);
-  padding: 8px 12px;
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+  padding: 8px 16px;
+  border-radius: 100px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   z-index: 10;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(4px);
+}
+
+.logout-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.logout-btn:active {
+  transform: translateY(0);
+  background: rgba(255,255,255,0.12);
 }
 
 @media (max-width: 840px) {
