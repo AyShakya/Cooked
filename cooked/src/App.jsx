@@ -22,16 +22,16 @@ import "./App.css";
 const BRANDS = {
   github: {
     name: "GitHub",
-    color: "#238636",
-    bg: "#0d1117",
+    color: "#4ae183",
+    bg: "#111611",
     icon: <Github size={44} />,
     tagline: "Commit crimes exposed.",
     placeholder: "github_username",
   },
   reddit: {
     name: "Reddit",
-    color: "#FF4500",
-    bg: "#1A1A1B",
+    color: "#ffb4a8",
+    bg: "#191214",
     icon: <Flame size={44} />,
     tagline: "Karma won't save you.",
     placeholder: "u/redditor",
@@ -87,7 +87,7 @@ export default function App() {
     const now = Date.now();
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
 
-    if (isLoggedIn && (now - lastActivity < INACTIVITY_LIMIT)) {
+    if (isLoggedIn && now - lastActivity < INACTIVITY_LIMIT) {
       setIsAuthenticated(true);
     } else {
       localStorage.removeItem("is_logged_in");
@@ -119,35 +119,31 @@ export default function App() {
   };
 
   const handleLogout = useCallback(() => {
-    // 1. Optimistic UI update: Immediate transition
     setIsAuthenticated(false);
     setProvider(null);
     setRoast("");
     setUsername("");
-    
-    // 2. Local Storage Cleanup
+
     localStorage.removeItem("is_logged_in");
     localStorage.removeItem("last_activity");
 
-    // 3. Fire and forget logout request to server
     api.post("/logout").catch((err) => {
       console.warn("Server logout failed, but local session cleared.", err);
     });
   }, []);
 
-  // Auto-Logout Logic
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
     let timeoutId;
 
     const resetTimer = () => {
       if (timeoutId) clearTimeout(timeoutId);
-      
+
       const lastActivity = parseInt(localStorage.getItem("last_activity") || "0");
       const now = Date.now();
-      
+
       if (now - lastActivity > INACTIVITY_LIMIT) {
         handleLogout();
         return;
@@ -225,15 +221,17 @@ export default function App() {
 
   if (!isAuthenticated) {
     return (
-      <div className="app-container" style={{ background: "#050505" }}>
+      <div className="app-container auth-screen" style={{ background: "#050505" }}>
+        <div className="scanline-overlay" />
         <m.div
           className="auth-card"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
         >
           <div className="lock-icon">
-            <Lock size={40} color="#ff3333" />
+            <Lock size={40} color="#ffb4a8" />
           </div>
+          <span className="eyebrow auth-eyebrow">Protocol: Vault_Alpha</span>
           <h1 className="auth-title">Restricted Access</h1>
           <p className="auth-subtitle">Enter VIP Clearance Code</p>
 
@@ -271,7 +269,7 @@ export default function App() {
     <div
       className="app-container"
       style={{
-        backgroundColor: activeTheme ? activeTheme.bg : "#0d0f16",
+        backgroundColor: activeTheme ? activeTheme.bg : "#131313",
         "--brand-color": activeTheme ? activeTheme.color : "#8f9bb3",
       }}
     >
@@ -280,14 +278,15 @@ export default function App() {
       </button>
 
       <div className="noise-overlay" />
+      <div className="scanline-overlay" />
 
       <div className="content-wrapper site-shell">
         <header className="hero-header">
-          <span className="eyebrow">AI Roast Studio</span>
+          <span className="eyebrow">System Initialization</span>
           <m.h1
             layoutId="title"
             className="logo-text"
-            style={{ color: activeTheme ? activeTheme.color : "#fff" }}
+            style={{ color: activeTheme ? activeTheme.color : "#e5e2e1" }}
           >
             {activeTheme ? `${activeTheme.name} Roast` : "Cooked."}
           </m.h1>
@@ -299,9 +298,9 @@ export default function App() {
         </header>
 
         <div className="feature-strip">
-          <span>⚡ instant punchlines</span>
-          <span>🧠 style-aware prompts</span>
-          <span>📋 one-click copy</span>
+          <span>instant punchlines</span>
+          <span>style-aware prompts</span>
+          <span>one-click copy</span>
         </div>
 
         <AnimatePresence mode="wait">
@@ -327,7 +326,7 @@ export default function App() {
                     {brand.icon}
                   </div>
                   <span className="brand-name">{brand.name}</span>
-                  {brand.disabled && <span className="tag-soon">Soon</span>}
+                  {brand.disabled ? <span className="tag-soon">Access restricted</span> : <span className="brand-cta">Initialize roast</span>}
                 </m.button>
               ))}
             </m.div>
@@ -341,7 +340,7 @@ export default function App() {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
               <section className="style-panel">
-                <h3>Roast personality</h3>
+                <h3>Select Persona Intensity</h3>
                 <div className="style-grid">
                   {ROAST_STYLES.map((style) => (
                     <button
@@ -359,6 +358,7 @@ export default function App() {
 
               <form onSubmit={handleRoast} className="roast-form">
                 <div className="input-group">
+                  <span className="input-label">Target Handle</span>
                   <input
                     autoFocus
                     type="text"
