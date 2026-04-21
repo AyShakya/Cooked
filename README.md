@@ -1,133 +1,177 @@
-# 🔥 Cooked: AI Social Media Profiler
+# Cooked
 
-**A secure, full-stack application that analyzes public social media profiles (GitHub, Reddit) to generate witty, personalized roasts using Llama 3 AI.**
+Cooked is a full-stack AI web application that generates playful roasts from public social profile signals.
+It is designed as a resume project to demonstrate practical backend security, API design, and polished frontend UX.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/status-Live-success)
-![Security](https://img.shields.io/badge/security-HttpOnly%20Cookies-red)
+## Project Summary
 
-## 🚀 Live Demo
-[**View Live App**](https://your-app-url.vercel.app)  
-*(Note: Requires a VIP Access Code. Contact me for a demo key.)*
+Given a GitHub or Reddit username, Cooked:
 
----
+1. Fetches public profile/activity data from platform APIs.
+2. Converts that data into a compact feature profile.
+3. Sends the profile to a hosted LLM (Llama 3.1 via Groq).
+4. Returns a stylized 4-line roast in one of multiple tones.
 
-## 🏗️ Architecture & Security
-This project was built with a "Security First" and "Zero Cost" mindset. It moves beyond standard JWT implementations by enforcing strict cross-origin policies and browser-native security headers.
+This project intentionally focuses on secure API access, low operational cost, and responsive UI interactions.
 
-### The "Fortress" Security Model
-1.  **HttpOnly Cookies:** Authentication tokens are stored in `HttpOnly` cookies, making them invisible to JavaScript and immune to XSS attacks (unlike LocalStorage).
-2.  **Strict CORS & SameSite Policies:** * Backend explicitly whitelists the Vercel frontend domain.
-    * Cookies are set with `SameSite=None; Secure` to allow secure cross-site credentials while blocking CSRF attempts.
-3.  **Anti-Brute Force Rate Limiting:** * **Auth Route:** Limits login attempts to 5 per hour per IP to prevent dictionary attacks.
-    * **API Route:** Limits generation requests to 20 per 15 minutes to prevent LLM API abuse and cost spikes.
-4.  **VIP Access Gate:** A custom middleware layer that restricts API usage to users with a valid access code, ensuring the free-tier infrastructure is not overwhelmed by bots.
+## Highlights
 
-### Tech Stack
-* **Frontend:** React (Vite), Framer Motion (Animations), Lucide React (Icons).
-* **Backend:** Node.js, Express, Rate-Limit-Express.
-* **AI Inference:** Groq Cloud (Llama 3.1-8b-Instant) for sub-second latency.
-* **Infrastructure:** Vercel (Frontend), Render (Backend).
+- Full-stack JavaScript architecture (React + Express).
+- JWT-based access control using HttpOnly cookies.
+- VIP gate flow to protect public endpoints from abuse.
+- Rate limiting on both authentication and generation routes.
+- Multi-style prompt system (Friendly, Savage, Analyst).
+- Framer Motion powered UI transitions and stateful UX flow.
 
----
+## Tech Stack
 
-## ⚖️ Engineering Trade-offs & Constraints
-Every architectural decision carries a cost. Here are the specific trade-offs made for this project:
+- Frontend: React 19, Vite, Axios, Framer Motion, Lucide Icons.
+- Backend: Node.js, Express 5, cookie-parser, jsonwebtoken, express-rate-limit.
+- AI: Groq OpenAI-compatible endpoint, model llama-3.1-8b-instant.
+- External Data Sources: GitHub REST API, Reddit public JSON endpoints.
 
-### 1. Stateless Architecture vs. Database
-* **Constraint:** The app uses JWTs (JSON Web Tokens) for auth but does not store user sessions in a database.
-* **Trade-off:** * *Pro:* **Zero Database Cost** and **Max Privacy**. No user data is ever persisted.
-    * *Con:* We cannot invalidate a specific token before it expires (e.g., "Force Logout" functionality relies on client-side cookie clearing or short expiration times).
+## Architecture
 
-### 2. Render Free Tier vs. Latency
-* **Constraint:** The backend is hosted on Render's free tier.
-* **Trade-off:**
-    * *Pro:* **$0.00 Monthly Cost.**
-    * *Con:* **Cold Starts.** The server "sleeps" after 15 minutes of inactivity, causing the first request to take ~30-50 seconds. (Mitigated by a loading skeleton in the UI).
+### Frontend Responsibilities
 
-### 3. Llama 3.1-8b vs. GPT-4
-* **Constraint:** Using Groq's open-source model host instead of OpenAI.
-* **Trade-off:**
-    * *Pro:* **Speed.** Inference is near-instant (<500ms) compared to GPT-4 (~3s).
-    * *Con:* **Nuance.** The roasts are slightly less context-heavy than GPT-4, but the speed improves the UX significantly for a "fun" app.
+- Handles VIP login flow and session-like UX state.
+- Calls backend endpoints with credentials enabled.
+- Collects platform + username + roast style and displays results.
 
----
+### Backend Responsibilities
 
-## 🛠️ Local Setup
+- Verifies VIP code and issues short-lived JWT token.
+- Stores token in secure cookie and validates token on protected routes.
+- Applies rate limits to reduce brute-force and API abuse risk.
+- Integrates with external profile APIs and AI generation service.
+
+## Security Decisions
+
+- HttpOnly cookie for token transport instead of exposing token to client JavaScript.
+- Timing-safe VIP code comparison to reduce side-channel risk.
+- CORS restricted to configured client origin with credentials support.
+- Auth and API route throttling using express-rate-limit.
+
+Current limiter configuration:
+
+- Auth route: 5 failed attempts per 24 hours per IP (successful attempts are skipped).
+- API routes: 20 requests per 15 minutes per IP.
+
+## API Contract
+
+Base URL: /api
+
+- POST /verify-vip
+    - Body: { "code": "your_vip_code" }
+    - Success: sets vip_token cookie, returns success message.
+
+- POST /logout
+    - Clears vip_token cookie.
+
+- POST /github?username=<name>&roastStyle=<friendly|savage|analyst>
+    - Protected route.
+    - Fetches GitHub profile + repos, returns roast output.
+
+- POST /reddit?username=<name>&roastStyle=<friendly|savage|analyst>
+    - Protected route.
+    - Fetches Reddit user + comments metadata, returns roast output.
+
+## Repository Structure
+
+.
+|- backend
+|  |- Routes
+|  |- Services
+|  |- middlewares
+|  |- package.json
+|  `- server.js
+|- cooked
+|  |- src
+|  |  |- api
+|  |  `- App.jsx
+|  |- package.json
+|  `- vite.config.js
+`- README.md
+
+## Local Development
 
 ### Prerequisites
-* Node.js (v18+)
-* Groq API Key (Free)
 
-### 1. Clone the Repo
-```bash
-git clone [https://github.com/your-username/cooked.git](https://github.com/your-username/cooked.git)
-cd cooked
+- Node.js 18+
+- npm
+- Groq API key
 
-```
-
-### 2. Backend Setup
+### 1) Backend Setup
 
 ```bash
 cd backend
 npm install
-
 ```
 
-Create a `.env` file in `/backend`:
+Create backend/.env:
 
 ```env
 PORT=5000
-GROQ_API_KEY=your_groq_key_here
-VIP_CODE=secret_password
-JWT_SECRET=super_long_random_string
+GROQ_API_KEY=your_groq_api_key
+VIP_CODE=your_vip_code
+JWT_SECRET=your_long_random_secret
 CLIENT_URL=http://localhost:5173
-
 ```
 
-Start the server:
+Run backend:
 
 ```bash
 npm start
-
 ```
 
-### 3. Frontend Setup
+### 2) Frontend Setup
 
 ```bash
-cd ../frontend
+cd cooked
 npm install
-
 ```
 
-Create a `.env` file in `/frontend`:
+Create cooked/.env:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
-
 ```
 
-Start the client:
+Run frontend:
 
 ```bash
 npm run dev
-
 ```
 
----
+Open the app at http://localhost:5173.
 
-## 🔮 Future Improvements
+## Deployment Notes
 
-* **Redis Caching:** To cache Reddit/GitHub API responses and reduce external API calls.
-* **Text-to-Speech:** Utilizing the Web Speech API to read roasts aloud.
-* **Roast History:** LocalStorage-based history of previous roasts.
+- Frontend and backend can be deployed independently.
+- Ensure CLIENT_URL exactly matches deployed frontend origin.
+- Ensure cookies are served securely in production (HTTPS).
+- Keep JWT_SECRET and VIP_CODE in secure environment variables.
 
----
+## Engineering Trade-offs
 
-## 👨‍💻 Author
+- Stateless auth keeps infra simple, but token revocation is limited.
+- No database lowers cost and complexity, but there is no historical analytics.
+- External API dependence may introduce occasional latency or upstream failures.
 
-**Ayush Shakya** [GitHub](https://www.google.com/search?q=https://github.com/AyShakya) | [LinkedIn](https://www.google.com/search?q=https://linkedin.com/in/your-linkedin)
+## What This Demonstrates For Recruiters
 
-```
+- Practical API security implementation in a real product flow.
+- Integration of third-party APIs and an LLM service with graceful error handling.
+- Clean separation of concerns across middleware, routes, and service layers.
+- UI state management for authentication, loading, and error conditions.
 
-```
+## Future Improvements
+
+- Add observability (structured logs + request tracing).
+- Add tests (unit tests for services, integration tests for API routes).
+- Add caching for repeated profile lookups.
+- Add persistence for user roast history and usage analytics.
+
+## Author
+
+Ayush Shakya
